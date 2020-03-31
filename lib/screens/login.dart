@@ -7,7 +7,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final double _formDistance = 10.0;
-  TextEditingController accountController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   @override
@@ -28,18 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           top: _formDistance, bottom: _formDistance),
                       child: Text('Welcome to App',
                           style: Theme.of(context).textTheme.title)),
-                  Padding(
-                      padding: EdgeInsets.only(
-                          top: _formDistance, bottom: _formDistance),
-                      child: TextField(
-                        controller: accountController,
-                        decoration: InputDecoration(
-                            hintText: 'eg. Syskron',
-                            labelText: 'Account Name',
-                            labelStyle: textStyle,
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5.0))),
-                      )),
                   Padding(
                       padding: EdgeInsets.only(
                           top: _formDistance, bottom: _formDistance),
@@ -87,7 +74,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() async {
-    accountController.text = '';
     passwordController.text = '';
     usernameController.text = '';
     this.navigate();

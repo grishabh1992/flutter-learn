@@ -2,33 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-Future<Album> fetchAlbum() async {
-  final response =
-      await http.get('https://jsonplaceholder.typicode.com/albums/1');
-
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return Album.fromJson(json.decode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
-  }
-}
-
-class Album {
-  final int userId;
+class User {
   final int id;
-  final String title;
+  final String email;
+  final String first_name;
+  final String last_name;
+  final String avatar;
 
-  Album({this.userId, this.id, this.title});
+  User({this.id, this.email, this.first_name, this.last_name, this.avatar});
 
-  factory Album.fromJson(Map<String, dynamic> json) {
-    return Album(
-      userId: json['userId'],
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      email: json['userId'],
       id: json['id'],
-      title: json['title'],
+      avatar: json['title'],
+      first_name: json['first_name'],
+      last_name: json['last_name'],
     );
   }
 }
@@ -39,46 +28,55 @@ class APIPage extends StatefulWidget {
 }
 
 class APIPageSTate extends State<APIPage> {
-  Future<Album> futureAlbum;
+  final List<User> users = [];
 
   @override
   void initState() {
     super.initState();
-    futureAlbum = fetchAlbum();
+    fetchUser();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Fetch Data Example'),
-      ),
-      body: Center(
-        child: FutureBuilder<Album>(
-          future: futureAlbum,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Text(snapshot.data.title);
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
-
-            // By default, show a loading spinner.
-            return CircularProgressIndicator();
-          },
+        appBar: AppBar(
+          title: Text('API calling'),
         ),
-      ),
-    );
+        body: ListView.builder(
+            itemCount: users.length,
+            itemBuilder: (context, index) {
+              final user = users[index];
+              return ListTile(
+                // leading: ConstrainedBox(
+                //   constraints: BoxConstraints(
+                //     minWidth: 44,
+                //     minHeight: 44,
+                //     maxWidth: 64,
+                //     maxHeight: 64,
+                //   ),
+                //   child: Image.asset(user.avatar, fit: BoxFit.cover),
+                // ),
+                title: Text(user.first_name),
+                subtitle: Text(user.email),
+              );
+            }));
+  }
+
+  void fetchUser() async {
+    final http.Response response =
+        await http.get('https://reqres.in/api/users?page=1');
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    responseData['data'].forEach((userDetail) {
+      final User user = User(
+          first_name: userDetail['first_name'],
+          last_name: userDetail['last_name'],
+          id: userDetail['id'],
+          avatar: userDetail['avatar'],
+          email: userDetail['email']);
+      setState(() {
+        print(user);
+        users.add(user);
+      });
+    });
   }
 }
-
-// class APIPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(title: Center(child: Text('API calling'))),
-//         body: Center(child: Text('Content Here'))
-//     );
-//   }
-// }
